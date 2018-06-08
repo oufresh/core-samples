@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS "Closure" (
+        `Parent`        INTEGER,
+        `Child` INTEGER,
+        `Depth` INTEGER,
+        PRIMARY KEY(`Parent`),
+        FOREIGN KEY('Parent') REFERENCES Tree('Id')
+);
+
+CREATE TABLE IF NOT EXISTS "Tree" (
+        `Id`    INTEGER,
+        `Parent`        INTEGER,
+        `Name`  TEXT,
+        `IsLeaf`        INTEGER,
+        PRIMARY KEY(`Id`)
+);
