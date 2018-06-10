@@ -31,7 +31,7 @@ namespace treeDb
                 Console.WriteLine("Choose a test");
                 Console.WriteLine("1 - BasicTree");
                 Console.WriteLine("2 - SimpleTree");
-                Console.WriteLine("2 - AdjacentiListTree");
+                Console.WriteLine("3 - AdjacentiListTree");
                 Console.WriteLine("q - Quit");
                 Console.WriteLine("");
 
@@ -55,6 +55,11 @@ namespace treeDb
                     case '3':
                         Console.WriteLine("Starting test AdjacentiListTree");
                         var tree = AdjacentiListTreeFactory.fromFile("tree.json");
+                        tree.ForEach((e)=>{
+                            StringBuilder sb = new StringBuilder();
+                            
+                            Console.WriteLine($"Element node {e.isNode}: {e.id}");
+                        });
                         break;
                     default:
                     break;
