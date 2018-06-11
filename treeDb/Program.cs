@@ -55,11 +55,18 @@ namespace treeDb
                     case '3':
                         Console.WriteLine("Starting test AdjacentiListTree");
                         var tree = AdjacentiListTreeFactory.fromFile("tree.json");
-                        tree.ForEach((e)=>{
-                            StringBuilder sb = new StringBuilder();
-                            
-                            Console.WriteLine($"Element node {e.isNode}: {e.id}");
-                        });
+                        AdjacentiListTreeConsoleRender.render(tree);
+                        Console.WriteLine("");
+                        Console.WriteLine("Search a child");
+                        adjacentiList.Elem e = tree.getElem(1);
+                        if (e != null) {
+                            Console.WriteLine("Elem " + e.id);
+                            List<adjacentiList.Elem> children = tree.getChildren(e);
+                            children.ForEach(child => {
+                                Console.WriteLine($"Child Elem {(child.isNode ? "-" : " ")} {child.id}");
+                            });
+                        }
+                        Console.WriteLine("");
                         break;
                     default:
                     break;

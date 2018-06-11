@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -13,6 +14,7 @@ namespace treeDb.adjacentiList
         public int id;
         public string name;
         public bool isNode;
+        public int depth;
     }
 
     public class Closure
@@ -35,23 +37,50 @@ namespace treeDb.adjacentiList
 
         public void insert(Elem newElem, Elem parent)
         {
-            //this._seqId++;
+            newElem.depth = ++parent.depth;
+            elements.Add(newElem);
+            closures.Add(new Closure(){
+                parent = parent.id,
+                child = newElem.id,
+                depth = newElem.depth
+            });
         }
 
         public void delete(Elem elem)
         {
+            navigateAfter(elem, child => {
+                elements.Remove(child);
+                var toRemove = closures.Where(cl => cl.parent == child.id).ToList();
+                closures.RemoveAll(cl => toRemove.Contains(cl));
+            });
+        }
 
+        public Elem getElem(int id)
+        {
+            return elements.Where(el => el.id == id).First();
+        }
+
+        public List<Elem> getChildren(Elem elem)
+        {
+            return closures.Where(closure => elem.id == closure.parent).Select(cl => {
+                return elements.Find(e => e.id == cl.child);
+            }).ToList();
+        }
+
+        protected void navigateAfter(Elem el, Action<Elem> f)
+        {
+            closures.Where(closure => closure.parent == el.id).Select(cl => {
+                return elements.Find(e => e.id == cl.child);
+            }).ToList().ForEach(cl => {
+                navigate(cl, f);
+            });
+
+            f.Invoke(el);
         }
 
         protected void navigate(Elem el, Action<Elem> f)
         {
-            f.Invoke(el);
-            closures.ForEach((closure) => {
-                if (closure.parent == el.id) {
-                    var childElem = elements.Find(e => e.id == closure.child);
-                    navigate(childElem, f);
-                }
-            });
+ 
         }
 
         public void ForEach(Action<Elem> f)
@@ -64,6 +93,22 @@ namespace treeDb.adjacentiList
         }
     }
 
+    public class AdjacentiListTreeConsoleRender
+    {
+        public static void render(AdjacentiListTree tree)
+        {
+            tree.ForEach((e)=>{
+                StringBuilder sb = new StringBuilder();
+                int depth = e.depth;
+                while (depth > 0) {
+                    sb.Append(" ");
+                    depth--;
+                }
+                Console.WriteLine($"{sb.ToString()}{(e.isNode ? "-" : " ")}: {e.id}");
+            });
+        }
+    }
+
     public class AdjacentiListTreeFactory
     {
         protected static void parse(JObject node, AdjacentiListTree tree, int depth = 0)
@@ -71,6 +116,7 @@ namespace treeDb.adjacentiList
             //id : 1
             //children : [1, ...] 
             Elem elem = new Elem();
+            elem.depth = depth;
             foreach (var jt in node) {
                 //Console.WriteLine(jt.Key + ": " + jt.Value);
                 if (jt.Key == "id")
@@ -82,7 +128,7 @@ namespace treeDb.adjacentiList
                         if (children.Count > 0)
                         {
                             elem.isNode = true;
-                            int d = depth++;
+                            int d = ++depth;
                             //giro per parsare tutti i children
                             foreach (var child in children) {
                                 if (child.Type == JTokenType.Object) {
