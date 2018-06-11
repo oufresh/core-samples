@@ -23,6 +23,7 @@ namespace treeDb.adjacentiList
     }
 
     public class AdjacentiListTree {
+        protected int _seqId = 0;
         public List<Elem> elements;
         public List<Closure> closures;
 
@@ -32,12 +33,40 @@ namespace treeDb.adjacentiList
             this.elements = new List<Elem>();
         }
 
-       
+        public void insert(Elem newElem, Elem parent)
+        {
+            //this._seqId++;
+        }
+
+        public void delete(Elem elem)
+        {
+
+        }
+
+        protected void navigate(Elem el, Action<Elem> f)
+        {
+            f.Invoke(el);
+            closures.ForEach((closure) => {
+                if (closure.parent == el.id) {
+                    var childElem = elements.Find(e => e.id == closure.child);
+                    navigate(childElem, f);
+                }
+            });
+        }
+
+        public void ForEach(Action<Elem> f)
+        {
+            var root = elements.Find(el => el.id == 0);
+            if (root != null)
+            {
+                this.navigate(root, f);
+            }
+        }
     }
 
     public class AdjacentiListTreeFactory
     {
-        protected static void parse(JObject node, AdjacentiListTree tree)
+        protected static void parse(JObject node, AdjacentiListTree tree, int depth = 0)
         {
             //id : 1
             //children : [1, ...] 
@@ -51,25 +80,24 @@ namespace treeDb.adjacentiList
                         var children = (JArray)jt.Value;
 
                         if (children.Count > 0)
+                        {
                             elem.isNode = true;
+                            int d = depth++;
+                            //giro per parsare tutti i children
+                            foreach (var child in children) {
+                                if (child.Type == JTokenType.Object) {
 
-                        //mi giro per prendere tutti gli id dei children
-                        /*foreach (var child in children) {
-                            if (child.Type == JTokenType.Object)
-                            {
-                                JObject childNode = (JObject)child;
-                                foreach (var prop in childNode) {
-                                    if (prop.Key == "id")
-                                        elem.children.Add(Int32.Parse(prop.Value.ToString()));
+                                    JObject childNode = (JObject)child;
+                                    //closure
+                                    int id = Int32.Parse(childNode["id"].ToString());
+                                    tree.closures.Add(new Closure(){
+                                        parent = elem.id,
+                                        child = id,
+                                        depth = depth
+                                    });
+                                    
+                                    parse(childNode, tree, d);
                                 }
-                            }
-                        }*/
-
-                        //giro per parsare tutti i children
-                        foreach (var child in children) {
-                            if (child.Type == JTokenType.Object) {
-                                JObject childNode = (JObject)child;
-                                parse(childNode, tree);
                             }
                         }
                     }
