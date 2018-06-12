@@ -37,7 +37,7 @@ namespace treeDb.adjacentiList
 
         public void insert(Elem newElem, Elem parent)
         {
-            newElem.depth = ++parent.depth;
+            newElem.depth = parent.depth + 1;
             elements.Add(newElem);
             closures.Add(new Closure(){
                 parent = parent.id,
@@ -50,7 +50,9 @@ namespace treeDb.adjacentiList
         {
             navigateAfter(elem, child => {
                 elements.Remove(child);
-                var toRemove = closures.Where(cl => cl.parent == child.id).ToList();
+                var toRemove = closures.Where(cl =>  {
+                    return cl.child == child.id;
+                }).ToList();
                 closures.RemoveAll(cl => toRemove.Contains(cl));
             });
         }
@@ -80,7 +82,12 @@ namespace treeDb.adjacentiList
 
         protected void navigate(Elem el, Action<Elem> f)
         {
- 
+            f.Invoke(el);
+            closures.Where(closure => closure.parent == el.id).Select(cl => {
+                return elements.Find(e => e.id == cl.child);
+            }).ToList().ForEach(cl => {
+                navigate(cl, f);
+            });
         }
 
         public void ForEach(Action<Elem> f)
