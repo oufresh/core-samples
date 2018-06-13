@@ -3,9 +3,9 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 
-namespace treeDb
+namespace TreeSample.BasicTree
 {
-    class Elem 
+    public class Elem 
     {
         public Elem(int id)
         {
@@ -23,7 +23,7 @@ namespace treeDb
         public List<int> children;
     }
 
-    class BasicTree
+    public class BasicTree
     {
         protected void renderNode(Elem node, int depth)
         {

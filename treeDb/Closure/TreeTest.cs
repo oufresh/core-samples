@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 
-namespace treeDb.db
+namespace TreeSample.Closure
 {
     public class TreeTest
     {
@@ -12,6 +12,7 @@ namespace treeDb.db
             {
                 ctx.Closure.FromSql("DELETE FROM Closure");
                 ctx.Tree.FromSql("DELETE FROM Tree");
+                ctx.SaveChanges();
             }
         }
 
@@ -19,7 +20,6 @@ namespace treeDb.db
         {
             try
             {
-                
                 using (var ctx = new appContext())
                 {
                     var t = new Tree(){
@@ -36,6 +36,7 @@ namespace treeDb.db
                     };
 
                     t.Closure.Add(cl);
+                    ctx.Tree.Add(t);
 
 
                     var c = new Tree(){
@@ -52,24 +53,59 @@ namespace treeDb.db
                     };
                     c.Closure.Add(cl);
 
-                    cl = new Closure(){
+                    var cl1 = new Closure(){
                         Child = 1,
                         Parent = 0,
                         Depth = 1,
                         ParentNavigation = t
                     };
-                    c.Closure.Add(cl);
+                    c.Closure.Add(cl1);
 
                     ctx.Tree.Add(c);
 
+
+/*
                     var f = new Tree(){
-                        Id = 1,
+                        Id = 10,
                         Name = "a child leaf",
                         IsLeaf = 1
                     };
 
+                    cl = new Closure(){
+                        Child = 10,
+                        Parent = 1,
+                        Depth = 1
+                    };
+                    f.Closure.Add(cl);
+                    ctx.Tree.Add(f);
 
+                    f = new Tree(){
+                        Id = 11,
+                        Name = "another child leaf",
+                        IsLeaf = 1
+                    };
 
+                    cl = new Closure(){
+                        Child = 11,
+                        Parent = 1,
+                        Depth = 1
+                    };
+                    f.Closure.Add(cl);
+                    ctx.Tree.Add(f);
+
+                    f = new Tree(){
+                        Id = 12,
+                        Name = "yet another child leaf",
+                        IsLeaf = 1
+                    };
+
+                    cl = new Closure(){
+                        Child = 12,
+                        Parent = 1,
+                        Depth = 1
+                    };
+                    f.Closure.Add(cl);
+                    ctx.Tree.Add(f);*/
 
                     ctx.SaveChanges();
                 }

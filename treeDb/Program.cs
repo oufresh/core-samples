@@ -5,9 +5,9 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using treeDb.adjacentiList;
+using TreeSample.adjacentiList;
 
-namespace treeDb
+namespace TreeSample
 {
     class Program
     {
@@ -32,7 +32,7 @@ namespace treeDb
                 Console.WriteLine("1 - BasicTree");
                 Console.WriteLine("2 - SimpleTree");
                 Console.WriteLine("3 - AdjacentiListTree");
-                Console.WriteLine("3 - AdjacentiList db tree");
+                Console.WriteLine("4 - AdjacentiList db tree");
                 Console.WriteLine("q - Quit");
                 Console.WriteLine("");
 
@@ -45,7 +45,7 @@ namespace treeDb
                         break;
                     case '1':
                         Console.WriteLine("Starting test BasicTree");
-                        BasicTree bst = new BasicTree();
+                        BasicTree.BasicTree bst = new BasicTree.BasicTree();
                         bst.Test();
                         break;
                     case '2':
@@ -60,7 +60,7 @@ namespace treeDb
                         break;
                     case '4':
                         Console.WriteLine("Starting test AdjacentiList db tree");
-                        var tt = new treeDb.db.TreeTest();
+                        var tt = new TreeSample.Closure.TreeTest();
                         tt.Test();
                         break;
                     default:

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace treeDb.db
+namespace TreeSample.Closure
 {
     public partial class Closure
     {

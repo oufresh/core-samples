@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace treeDb.SimpleTree
+namespace TreeSample.SimpleTree
 {
     public class SimpleElem
     {

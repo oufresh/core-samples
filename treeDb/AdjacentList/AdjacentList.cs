@@ -7,7 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace treeDb.adjacentiList
+namespace TreeSample.adjacentiList
 {
     public class Elem 
     {

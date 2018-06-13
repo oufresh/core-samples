@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace treeDb.db
+namespace TreeSample.Closure
 {
     public partial class appContext : DbContext
     {
@@ -14,6 +14,7 @@ namespace treeDb.db
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseSqlite(@"DataSource=app.db");
+                optionsBuilder.EnableSensitiveDataLogging(true);
             }
         }
 

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace treeDb.db
+namespace TreeSample.Closure
 {
     public partial class Tree
     {
         public Tree()
         {
-            Closure = new HashSet<treeDb.db.Closure>();
+            Closure = new HashSet<TreeSample.Closure.Closure>();
         }
 
         public long Id { get; set; }

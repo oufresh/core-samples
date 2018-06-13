@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Collections;
 
-namespace treeDb.db
+namespace TreeSample.Closure
 {
     public class TreeManager
     {

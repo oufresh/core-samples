@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace treeDb.SimpleTree
+namespace TreeSample.SimpleTree
 {
     public class SimpleTree
     {
