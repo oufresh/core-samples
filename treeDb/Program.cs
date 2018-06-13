@@ -32,6 +32,7 @@ namespace treeDb
                 Console.WriteLine("1 - BasicTree");
                 Console.WriteLine("2 - SimpleTree");
                 Console.WriteLine("3 - AdjacentiListTree");
+                Console.WriteLine("3 - AdjacentiList db tree");
                 Console.WriteLine("q - Quit");
                 Console.WriteLine("");
 
@@ -57,27 +58,17 @@ namespace treeDb
                         var test = new AjacentListTest("tree.json");
                         test.testRender();
                         break;
+                    case '4':
+                        Console.WriteLine("Starting test AdjacentiList db tree");
+                        var tt = new treeDb.db.TreeTest();
+                        tt.Test();
+                        break;
                     default:
                     break;
                 }
                 
                 Console.WriteLine("");
             }
-
-            /*using (var db = new TreeDbContext())
-            {
-                db.tree.RemoveRange(db.tree);
-                db.closure.RemoveRange(db.closure);
-
-                db.Add(new Tree {
-                    Id = 1,
-                    Parent = 0,
-                    Name = "root",
-                    IsLeaf = 0
-                });
-
-                db.SaveChanges();
-            }*/
         }
     }
 }
