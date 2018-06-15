@@ -32,7 +32,8 @@ namespace TreeSample
                 Console.WriteLine("1 - BasicTree");
                 Console.WriteLine("2 - SimpleTree");
                 Console.WriteLine("3 - AdjacentiListTree");
-                Console.WriteLine("4 - AdjacentiList db tree");
+                Console.WriteLine("4 - AdjacentiListModel db tree");
+                Console.WriteLine("5 - Closure db tree");
                 Console.WriteLine("q - Quit");
                 Console.WriteLine("");
 
@@ -59,7 +60,11 @@ namespace TreeSample
                         test.testRender();
                         break;
                     case '4':
-                        Console.WriteLine("Starting test AdjacentiList db tree");
+                        Console.WriteLine("Starting test AdjacentiListModel db tree");
+                        TreeSample.adjacentListModel.AdjacentListModelTest.test();
+                        break;
+                    case '5':
+                        Console.WriteLine("Starting test Closure db tree");
                         var tt = new TreeSample.Closure.TreeTest();
                         tt.Test();
                         break;

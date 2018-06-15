@@ -10,8 +10,10 @@ namespace TreeSample.Closure
         {
             using (var ctx = new appContext())
             {
-                ctx.Closure.FromSql("DELETE FROM Closure");
-                ctx.Tree.FromSql("DELETE FROM Tree");
+                ctx.Closure.RemoveRange(ctx.Closure);
+                //ctx.Closure.FromSql("DELETE FROM Closure");
+                ctx.Tree.RemoveRange(ctx.Tree);
+                //ctx.Tree.FromSql("DELETE FROM Tree");
                 ctx.SaveChanges();
             }
         }
@@ -51,7 +53,7 @@ namespace TreeSample.Closure
                         Depth = 0,
                         ParentNavigation = c
                     };
-                    c.Closure.Add(cl);
+                    ctx.Closure.Add(cl);
 
                     var cl1 = new Closure(){
                         Child = 1,
@@ -59,7 +61,7 @@ namespace TreeSample.Closure
                         Depth = 1,
                         ParentNavigation = t
                     };
-                    c.Closure.Add(cl1);
+                    ctx.Closure.Add(cl1);
 
                     ctx.Tree.Add(c);
 

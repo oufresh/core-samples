@@ -1,3 +1,13 @@
+-- Adjacent List Model
+CREATE TABLE `Tree` (
+	`Id`	INTEGER NOT NULL,
+	`Parent`	INTEGER,
+	`Name`	TEXT,
+	`IsLeaf`	INTEGER,
+	PRIMARY KEY(`Id`)
+);
+
+-- Closure Table Model
 CREATE TABLE `Closure` (
 	`Parent`	INTEGER,
 	`Child`	INTEGER,
