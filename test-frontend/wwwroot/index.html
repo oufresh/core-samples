@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<title>test-frontend home</title>
+<style>
+* {
+	box-sizing: border-box;
+}
+
+h1 {
+	margin: 15px;
+}
+
+.main {
+	padding: 5px;
+	display: flex;
+	flex-direction: column;
+}
+
+.fieldset {
+	margin-bottom: 20px;
+	width: 50%;
+	border: 1px solid black;
+}
+
+.fieldset>label {
+	font-weight: bold;
+}
+
+.col {
+	margin-top: 5px;
+	display: flex;
+	flex-direction: column;
+	padding: 5px;
+	display: flex;
+}
+
+.row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin-bottom: 5px;
+}
+
+.alert-text {
+	resize: none;
+	width: 70%;
+	height: 80px;
+}
+</style>
+</head>
+<body>
+	<h1>Test frontend Home</h1>
+	<main class="main">
+		<fieldset class="fieldset">
+			<label>Diagnostic properties</label>
+			<div class="col" id="props"></div>
+		</fieldset>
+
+		<fieldset class="fieldset">
+			<label>Mission control</label>
+			<div class="col">
+				<div class="row">
+					<label>Reset Mission</label>
+					<button id="button">Reset</button>
+				</div>
+			</div>
+		</fieldset>
+		<fieldset class="fieldset">
+			<label>Compose generic alert</label>
+			<div class="col">
+				<div class="row">
+					<label>Write a generic alert</label>
+					<textarea class="alert-text" id="alert-text"></textarea>
+				</div>
+				<div class="row">
+					<label>Send alert</label>
+					<button id="alert-button">Send</button>
+				</div>
+			</div>
+		</fieldset>
+		<fieldset class="fieldset">
+			<label>Alerts controls</label>
+			<div class="col">
+				<div class="row">
+					<label>Reset all alerts</label>
+					<button id="reset-alert-button">Reset</button>
+				</div>
+			</div>
+		</fieldset>
+	</main>
+</body>
+<script>
+	const state = {
+		running: false
+	};
+	
+	const errLogger = e => console.error(e);
+	
+	function fetchStatus() {
+		fetch("test").then(r => r.json()).then(data => {
+			console.log(data);
+			let rows = "";
+			for (const k in data) {
+				rows += '<div class="row"><label>' + k.toUpperCase() + '</label><span>' + data[k] + "</span></div>";
+				if (k === "running") {
+					state.running = data[k];
+					commButton.innerHTML = `${state.running === true ? "STOP" : "FALSE"}`;
+				}
+			}
+			props.innerHTML = rows;
+		}).catch(errLogger);	
+	}
+	
+	function onComm() {
+		const url = "reset";
+		fetch(url, { method: "PUT" }).then(r => r.text()).then(d => {
+			console.log(d);
+		}).catch(errLogger);
+	}
+	
+	async function onSendButtonClick() {
+		try {
+			const url = "alert";
+			const alert = {
+					type: "GENERIC",
+				    json_object: alertText.value,
+				    managed: false,
+				    userId: "admin",
+				    userLogin: "admin"
+					
+			};
+			const resp = await fetch(url, {
+					method: "POST",  headers: {
+			      		'Accept': 'application/json',
+			      		'Content-Type': 'application/json'
+			    	},
+			    	body: JSON.stringify(alert)
+			    });
+			const uuid = await resp.text();
+			console.log("Sent alert with uuid ", uuid);
+			alertText.value = "";
+		} catch (e) {
+			console.error(e);
+			alertText.value = "";
+		}
+	}
+
+	async function onResetButtonClick() {
+		try {
+			const url = "resetAlerts";
+
+			const resp = await fetch(url, { method: "PUT" });
+			const uuid = await resp.text();
+			console.log("Reset alerts");
+		} catch (e) {
+			console.error(e);
+		}
+	}
+	//page init
+	const props = document.getElementById("props");
+	const commButton = document.getElementById("button");
+	commButton.addEventListener("click", onComm);
+	const alertText = document.getElementById("alert-text");
+	const alertButton = document.getElementById("alert-button");
+	alertButton.addEventListener("click", onSendButtonClick);
+	const resetAlertsButton = document.getElementById("reset-alert-button");
+	resetAlertsButton.addEventListener("click", onResetButtonClick);
+	
+	fetchStatus();
+	
+	</script>
+</html>
