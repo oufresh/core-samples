@@ -1,10 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using TreeSample.adjacentiList;
 
 namespace TreeSample
@@ -16,11 +12,8 @@ namespace TreeSample
         static void Main(string[] args)
         {
             var exit = false;
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-            Configuration = builder.Build();
+            
+            var builder = new ConfigurationBuilder();
 
             Console.WriteLine("Tree test program");
             //Console.WriteLine($"suboption1 = {Configuration["subsection:suboption1"]}");

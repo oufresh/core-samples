@@ -64,10 +64,10 @@ namespace TreeSample.adjacentListModel
 
                 //meglio usare la reduce!!!
 
-                while (true) {
+                /*while (true) {
                     var t = ctx.Tree.Where(e => e.Id == Id).Select()
-                    if (t.Parent!= null
-                }
+                    if (t.Parent!= null)
+                }*/
             }
 
             return depth;
