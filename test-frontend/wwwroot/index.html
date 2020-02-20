@@ -59,118 +59,100 @@ h1 {
 			<label>Diagnostic properties</label>
 			<div class="col" id="props"></div>
 		</fieldset>
-
-		<fieldset class="fieldset">
-			<label>Mission control</label>
-			<div class="col">
-				<div class="row">
-					<label>Reset Mission</label>
-					<button id="button">Reset</button>
-				</div>
-			</div>
-		</fieldset>
-		<fieldset class="fieldset">
-			<label>Compose generic alert</label>
-			<div class="col">
-				<div class="row">
-					<label>Write a generic alert</label>
-					<textarea class="alert-text" id="alert-text"></textarea>
-				</div>
-				<div class="row">
-					<label>Send alert</label>
-					<button id="alert-button">Send</button>
-				</div>
-			</div>
-		</fieldset>
-		<fieldset class="fieldset">
-			<label>Alerts controls</label>
-			<div class="col">
-				<div class="row">
-					<label>Reset all alerts</label>
-					<button id="reset-alert-button">Reset</button>
-				</div>
-			</div>
-		</fieldset>
 	</main>
 </body>
 <script>
-	const state = {
+	let state = {
 		running: false
 	};
-	
-	const errLogger = e => console.error(e);
-	
-	function fetchStatus() {
-		fetch("test").then(r => r.json()).then(data => {
-			console.log(data);
-			let rows = "";
-			for (const k in data) {
-				rows += '<div class="row"><label>' + k.toUpperCase() + '</label><span>' + data[k] + "</span></div>";
-				if (k === "running") {
-					state.running = data[k];
-					commButton.innerHTML = `${state.running === true ? "STOP" : "FALSE"}`;
-				}
+
+	const comps = [];
+
+	function register(c) {
+		comps.push(c);
+		c.mount();
+		c.render();
+	}
+
+	function connect(F, map, newStateF) {
+
+		const dispatchRender = (state) => {
+			for (const c of comps) {
+				if (typeof c === "object" && c.render) { c.update({...c.props, ...map(state)}); c.render(); }
+				else if (typeof c === "function") c();
+				else console.log("Component strange ...");
 			}
-			props.innerHTML = rows;
-		}).catch(errLogger);	
-	}
-	
-	function onComm() {
-		const url = "reset";
-		fetch(url, { method: "PUT" }).then(r => r.text()).then(d => {
-			console.log(d);
-		}).catch(errLogger);
-	}
-	
-	async function onSendButtonClick() {
-		try {
-			const url = "alert";
-			const alert = {
-					type: "GENERIC",
-				    json_object: alertText.value,
-				    managed: false,
-				    userId: "admin",
-				    userLogin: "admin"
-					
-			};
-			const resp = await fetch(url, {
-					method: "POST",  headers: {
-			      		'Accept': 'application/json',
-			      		'Content-Type': 'application/json'
-			    	},
-			    	body: JSON.stringify(alert)
-			    });
-			const uuid = await resp.text();
-			console.log("Sent alert with uuid ", uuid);
-			alertText.value = "";
-		} catch (e) {
-			console.error(e);
-			alertText.value = "";
 		}
+
+		function setState(...args) {
+			const newState = newStateF(...args);
+			if (!Object.is(newState, state)) {
+				state = newState;
+				setTimeout(dispatchRender(state), 50);
+			}
+		}
+
+		const connected = (...args) => {
+			return new F({ ...map(state), setState, ...args });
+		}
+
+		return connected;
 	}
 
-	async function onResetButtonClick() {
-		try {
-			const url = "resetAlerts";
+	function getCookie(cname) {
+		var name = cname + "=";
+		var decodedCookie = decodeURIComponent(document.cookie);
+		var ca = decodedCookie.split(';');
+		for(var i = 0; i <ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0) == ' ') {
+				c = c.substring(1);
+			}
+			if (c.indexOf(name) == 0) {
+				return c.substring(name.length, c.length);
+			}
+		}
+		return "";
+	}
 
-			const resp = await fetch(url, { method: "PUT" });
-			const uuid = await resp.text();
-			console.log("Reset alerts");
-		} catch (e) {
-			console.error(e);
+	
+	class Table {
+		constructor(props) {
+			this.props = props;
+			this.fetchStatus = this.fetchStatus.bind(this);
+		}
+
+		fetchStatus() {
+			const csrfToken = getCookie("XSRF-TOKEN");
+			fetch("test", { headers: {
+				"X-XSRF-TOKEN": csrfToken
+			}}).then(r => r.text()).then(data => {
+				console.log(data);
+				this.props.setState(data);
+			}).catch(e => {
+				console.error(e);
+			});
+		}
+
+		mount() {
+			setInterval(this.fetchStatus, 3000);
+		}
+
+		update(newProps) {
+			this.props = newProps;
+		}
+
+		render() {
+			const pp = document.getElementById("props");
+			let rows = "";
+			rows += '<div class="row"><label>' + 'Running' + '</label><span>' + `${this.props.running === "true" ? "TRUE" : "FALSE"}` + "</span></div>";
+			pp.innerHTML = rows;
 		}
 	}
-	//page init
-	const props = document.getElementById("props");
-	const commButton = document.getElementById("button");
-	commButton.addEventListener("click", onComm);
-	const alertText = document.getElementById("alert-text");
-	const alertButton = document.getElementById("alert-button");
-	alertButton.addEventListener("click", onSendButtonClick);
-	const resetAlertsButton = document.getElementById("reset-alert-button");
-	resetAlertsButton.addEventListener("click", onResetButtonClick);
 	
-	fetchStatus();
-	
+	const T = connect(Table, s => ({ running: s.running}), running => ({ running }));
+	const t = T();
+	register(t);
+
 	</script>
 </html>

@@ -16,6 +16,9 @@ namespace test_frontend
         {
             services.AddControllersWithViews();
             services.AddRouting();
+            /*services.AddAntiforgery(options => {
+                options.HeaderName = "X-XSRF-TOKEN"; }
+            );*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -32,15 +35,54 @@ namespace test_frontend
                 app.UseHsts();
             }
 
+            /*app.Use(async (context, next) =>
+            {
+                // Do work that doesn't write to the Response.
+                await next.Invoke();
+                // Do logging or other work that doesn't write to the Response.
+            });*/
+
+            app.Use(async (context, next) =>
+            {
+                string path = context.Request.Path.Value;
+
+                if (
+                    string.Equals(path, "/", System.StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(path, "/index.html", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    System.Console.WriteLine("GET index or default");
+                    // The request token can be sent as a JavaScript-readable cookie, 
+                    // and Angular uses it by default.
+                    /* var tokens = antiforgery.GetAndStoreTokens(context);*/
+                    context.Response.Cookies.Append("XSRF-TOKEN", "cane",
+                      new CookieOptions() { HttpOnly = false });
+                    
+                    await next.Invoke();
+                } 
+                else if (path.IndexOf("test") >= 0) {
+                    if (context.Request.Headers["X-XSRF-TOKEN"] != "cane") {
+                        System.Console.Error.WriteLine("X-XSRF-TOKEN not found");
+                        context.Response.StatusCode = 401;
+                        await context.Response.WriteAsync("Op not permitted");
+                    } else
+                        await next.Invoke();
+                }
+                else {
+                    await next.Invoke();
+                }
+                
+            });
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
             app.UseEndpoints(endpoints =>
-            {   endpoints.MapGet("/test", async context =>
+            {
+                endpoints.MapGet("/test", async context =>
                     {
-                        await context.Response.WriteAsync("ok");
+                        System.Console.WriteLine("Resp to test");
+                        await context.Response.WriteAsync("true");
                     });
                 endpoints.MapDefaultControllerRoute();
             }).UseSpa(_ => { });
